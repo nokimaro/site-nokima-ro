@@ -4,18 +4,117 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="theme-color" content="#000000" />
-    <title>There is no spoon</title>
+    <title>Knock, knock...</title>
     <style type="text/css">
-        html,body{
-           height: 100%;
-           margin: 0;
-           background-color: #000000;
-           overflow: hidden;
-          
+        body {
+            background: #000;
+            overflow: hidden;
+            margin: 0; 
+            overflow: hidden;
+        }
+
+        canvas {
+            background: #101010;
+            background: radial-gradient(#1d1d1d, #101010);
+            bottom: 0;
+            box-shadow: 0 0 0 2px #191919;
+            left: 0;
+            margin: auto;
+            position: absolute;
+            right: 0;
+            top: 0;
         }
     </style>    
   </head>
-  <body style="margin: 0; overflow: hidden;">  
-      <script src="/p5.min.js"></script>
+  <body>
+  <script>
+  var c = document.createElement('canvas'),
+	ctx = c.getContext('2d'),
+	cw = c.width = window.innerWidth,
+	ch = c.height = window.innerHeight,
+	messageString = 'Wake up, Neo...',
+	messageArray = messageString.split(''),
+	messageLength = messageArray.length,
+	pointer = 0,
+	typeTick = 0,
+	typeTickMax = 10,
+	typeResetTick = 0,
+	typeResetMax = 200;
+
+ctx.font = 'normal 20px monospace';
+ctx.textAlign = 'left';
+ctx.textBaseline = 'top';
+ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+ctx.shadowColor = '#3f3';
+
+var updateTypeTick = function(){
+	if(pointer < messageLength){
+		if(typeTick < typeTickMax){
+			typeTick++;
+		} else {
+			typeTick = 0;
+			pointer++;
+		}
+	} else {
+		if(typeResetTick < typeResetMax){
+			typeResetTick++;
+		} else {
+			typeResetTick = 0;
+			typeTick = 0;
+			pointer = 0;
+		}
+	}
+}
+
+var renderMessage = function(){
+	var text = messageArray.slice(0, pointer);
+	ctx.shadowBlur = 10;
+	ctx.fillStyle = 'hsla(120, 20%, 50%, 0.25)';
+	var x = (window.innerWidth/2)-(170/2),
+		y = (window.innerHeight/2);
+	
+	if( Math.random() < 0.05 ) {
+		ctx.fillStyle = 'hsla(120, 30%, 50%, ' + ( 0.25 + Math.random() * 0.5 ) + ')';
+	}
+	if( Math.random() < 0.05 ) {
+		x += -3 + Math.random() * 6;
+	}
+	if( Math.random() < 0.05 ) {
+		y += -3 + Math.random() * 6;
+	}
+	if( Math.random() < 0.1 ) {
+		ctx.shadowBlur = Math.random() * 15;
+	}
+	if( Math.random() < 0.99 ) {
+		ctx.fillText( text.join( '' ), Math.round( x ), Math.round( y ) );
+	}
+	ctx.shadowBlur = 0;
+}
+    
+var renderLines = function(){
+	ctx.globalCompositeOperation = 'source-over';
+	ctx.beginPath();
+	for(var i = 0; i < ch/2; i += 1){    
+		ctx.moveTo(0, (i*2) + .5);
+		ctx.lineTo(cw, (i*2) + .5);    
+	}
+	ctx.stroke();
+	ctx.globalCompositeOperation = 'lighter';
+}
+
+var loop = function(){
+	requestAnimationFrame( loop );
+	ctx.globalCompositeOperation = 'destination-out';
+	ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+	ctx.fillRect( 0, 0, cw, ch );
+	ctx.globalCompositeOperation = 'lighter';
+	updateTypeTick();
+	renderMessage();
+	renderLines();
+}
+ 
+document.body.appendChild(c);
+loop();
+  </script>
   </body>
 </html>
